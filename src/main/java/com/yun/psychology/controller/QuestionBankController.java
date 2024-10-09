@@ -1,5 +1,6 @@
 package com.yun.psychology.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yun.psychology.annotation.AuthCheck;
 import com.yun.psychology.common.BaseResponse;
@@ -52,6 +53,7 @@ public class QuestionBankController {
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBank(@RequestBody QuestionBankAddRequest questionBankAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankAddRequest == null, ErrorCode.PARAMS_ERROR);
         // todo 在此处将实体类和 DTO 进行转换
@@ -62,6 +64,8 @@ public class QuestionBankController {
         // todo 填充默认值
         User loginUser = userService.getLoginUser(request);
         questionBank.setUserId(loginUser.getId());
+        questionBank.setCreateTime(DateUtil.date());
+
         // 写入数据库
         boolean result = questionBankService.save(questionBank);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -114,6 +118,7 @@ public class QuestionBankController {
         BeanUtils.copyProperties(questionBankUpdateRequest, questionBank);
         // 数据校验
         questionBankService.validQuestionBank(questionBank, false);
+        questionBank.setUpdateTime(DateUtil.date());
         // 判断是否存在
         long id = questionBankUpdateRequest.getId();
         QuestionBank oldQuestionBank = questionBankService.getById(id);
@@ -131,8 +136,8 @@ public class QuestionBankController {
      * @return
      */
     @GetMapping("/get/vo")
-    public BaseResponse<QuestionBankVO> getQuestionBankVOById(long id, HttpServletRequest request) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+    public BaseResponse<QuestionBankVO> getQuestionBankVOById(@RequestParam long id, HttpServletRequest request) {
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         QuestionBank questionBank = questionBankService.getById(id);
         ThrowUtils.throwIf(questionBank == null, ErrorCode.NOT_FOUND_ERROR);

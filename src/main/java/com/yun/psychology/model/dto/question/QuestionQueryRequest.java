@@ -28,6 +28,11 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
     private Long notId;
 
     /**
+     * 题库ID
+     */
+    private Long questionBankId;
+
+    /**
      * 搜索词
      */
     private String searchText;
@@ -41,6 +46,11 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
      * 内容
      */
     private String content;
+
+    /**
+     * 推荐答案
+     */
+    private String answer;
 
     /**
      * 标签列表

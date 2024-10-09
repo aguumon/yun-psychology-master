@@ -30,9 +30,21 @@ public class QuestionEditRequest implements Serializable {
     private String content;
 
     /**
+     * 推荐答案
+     */
+    private String answer;
+
+    /**
      * 标签列表
      */
     private List<String> tags;
+
+    /**
+     * 题目来源
+     */
+    private String source;
+
+
 
     private static final long serialVersionUID = 1L;
 }

@@ -30,9 +30,22 @@ public class QuestionUpdateRequest implements Serializable {
     private String content;
 
     /**
+     * 推荐答案
+     */
+    private String answer;
+
+    /**
      * 标签列表
      */
     private List<String> tags;
+    /**
+     * 题目来源
+     */
+    private String source;
+    /**
+     * 优先级
+     */
+    private Integer priority;
 
     private static final long serialVersionUID = 1L;
 }

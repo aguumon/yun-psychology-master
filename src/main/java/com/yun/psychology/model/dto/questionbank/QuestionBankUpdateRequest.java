@@ -23,11 +23,14 @@ public class QuestionBankUpdateRequest implements Serializable {
      * 标题
      */
     private String title;
-
     /**
-     * 内容
+     * 描述
      */
-    private String content;
+    private String description;
+    /**
+     * 图片
+     */
+    private String picture;
 
     /**
      * 标签列表

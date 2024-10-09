@@ -14,20 +14,17 @@ import java.util.List;
 @Data
 public class QuestionBankQuestionAddRequest implements Serializable {
 
-    /**
-     * 标题
-     */
-    private String title;
 
     /**
-     * 内容
+     * 题库 id
      */
-    private String content;
+    private Long questionBankId;
 
     /**
-     * 标签列表
+     * 题目 id
      */
-    private List<String> tags;
+    private Long questionId;
+
 
     private static final long serialVersionUID = 1L;
 }

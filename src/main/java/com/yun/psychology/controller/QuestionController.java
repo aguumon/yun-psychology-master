@@ -1,5 +1,8 @@
 package com.yun.psychology.controller;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yun.psychology.annotation.AuthCheck;
 import com.yun.psychology.common.BaseResponse;
@@ -16,6 +19,7 @@ import com.yun.psychology.model.dto.question.QuestionUpdateRequest;
 import com.yun.psychology.model.entity.Question;
 import com.yun.psychology.model.entity.User;
 import com.yun.psychology.model.vo.QuestionVO;
+import com.yun.psychology.service.QuestionBankQuestionService;
 import com.yun.psychology.service.QuestionService;
 import com.yun.psychology.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +46,9 @@ public class QuestionController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private QuestionBankQuestionService questionBankQuestionService;
+
     // region 增删改查
 
     /**
@@ -52,16 +59,20 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionAddRequest == null, ErrorCode.PARAMS_ERROR);
         // todo 在此处将实体类和 DTO 进行转换
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
+        question.setTags(JSONUtil.toJsonStr(questionAddRequest.getTags()));
         // 数据校验
         questionService.validQuestion(question, true);
         // todo 填充默认值
         User loginUser = userService.getLoginUser(request);
         question.setUserId(loginUser.getId());
+        question.setCreateTime(DateUtil.date());
+        
         // 写入数据库
         boolean result = questionService.save(question);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -78,6 +89,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestion(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -112,6 +124,7 @@ public class QuestionController {
         // todo 在此处将实体类和 DTO 进行转换
         Question question = new Question();
         BeanUtils.copyProperties(questionUpdateRequest, question);
+        question.setTags(JSONUtil.toJsonStr(questionUpdateRequest.getTags()));
         // 数据校验
         questionService.validQuestion(question, false);
         // 判断是否存在
@@ -131,8 +144,8 @@ public class QuestionController {
      * @return
      */
     @GetMapping("/get/vo")
-    public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+    public BaseResponse<QuestionVO> getQuestionVOById(@RequestParam long id, HttpServletRequest request) {
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Question question = questionService.getById(id);
         ThrowUtils.throwIf(question == null, ErrorCode.NOT_FOUND_ERROR);
@@ -149,11 +162,14 @@ public class QuestionController {
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
+        ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
+        QueryWrapper<Question> queryWrapper = questionService.getQueryWrapper(questionQueryRequest);
+
         // 查询数据库
         Page<Question> questionPage = questionService.page(new Page<>(current, size),
-                questionService.getQueryWrapper(questionQueryRequest));
+                queryWrapper);
         return ResultUtils.success(questionPage);
     }
 
@@ -167,6 +183,7 @@ public class QuestionController {
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
                                                                HttpServletRequest request) {
+        ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫
@@ -218,6 +235,7 @@ public class QuestionController {
         // todo 在此处将实体类和 DTO 进行转换
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);
+        question.setTags(JSONUtil.toJsonStr(questionEditRequest.getTags()));
         // 数据校验
         questionService.validQuestion(question, false);
         User loginUser = userService.getLoginUser(request);

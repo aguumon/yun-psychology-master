@@ -28,24 +28,15 @@ public class QuestionBankQuestionQueryRequest extends PageRequest implements Ser
     private Long notId;
 
     /**
-     * 搜索词
+     * 题库 id
      */
-    private String searchText;
+    private Long questionBankId;
 
     /**
-     * 标题
+     * 题目 id
      */
-    private String title;
+    private Long questionId;
 
-    /**
-     * 内容
-     */
-    private String content;
-
-    /**
-     * 标签列表
-     */
-    private List<String> tags;
 
     /**
      * 创建用户 id
