@@ -127,9 +127,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             }
         }
         // 精确查询
-        queryWrapper.ne(notId > 0, "id", notId);
-        queryWrapper.eq(id > 0, "id", id);
-        queryWrapper.eq(userId > 0, "userId", userId);
+        queryWrapper.ne(notId != null, "id", notId);
+        queryWrapper.eq(id != null, "id", id);
+        queryWrapper.eq(userId != null, "userId", userId);
         // 排序规则
         queryWrapper.orderBy(SqlUtils.validSortField(sortField),
                 sortOrder.equals(CommonConstant.SORT_ORDER_ASC),

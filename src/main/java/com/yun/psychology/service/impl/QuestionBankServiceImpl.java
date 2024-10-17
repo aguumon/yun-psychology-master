@@ -1,6 +1,7 @@
 package com.yun.psychology.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -121,9 +122,9 @@ public class QuestionBankServiceImpl extends ServiceImpl<QuestionBankMapper, Que
             }
         }
         // 精确查询
-        queryWrapper.ne(notId > 0, "id", notId);
-        queryWrapper.eq(id > 0, "id", id);
-        queryWrapper.eq(userId > 0, "userId", userId);
+        queryWrapper.ne( notId != null, "id", notId);
+        queryWrapper.eq(id != null, "id", id);
+        queryWrapper.eq(userId != null, "userId", userId);
         // 排序规则
         queryWrapper.orderBy(SqlUtils.validSortField(sortField),
                 sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
